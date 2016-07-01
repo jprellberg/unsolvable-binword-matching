@@ -32,7 +32,7 @@ dependencies {
 jmh {
 	includeTests = false
 	threads = 4
-	warmupIterations = 1
-	iterations = 1
+	warmupIterations = 4
+	iterations = 10
 	fork = 1
 }
