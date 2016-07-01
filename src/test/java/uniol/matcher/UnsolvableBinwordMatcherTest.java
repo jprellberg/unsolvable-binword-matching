@@ -19,7 +19,7 @@
 
 package uniol.matcher;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -58,15 +58,23 @@ public class UnsolvableBinwordMatcherTest {
 
 	@Test
 	public void javaRegexUBMTest() {
-		test(new JavaRegexUBM());
+		UnsolvableBinwordMatcher matcher = new JavaRegexUBM();
+		testUnsolvableWords(matcher);
+		testUnsolvableSubWord(matcher);
 	}
 
-	private void test(UnsolvableBinwordMatcher matcher) {
+	private void testUnsolvableWords(UnsolvableBinwordMatcher matcher) {
 		for (String word : unsolvableWords) {
 			if (!matcher.isUnsolvableBinaryWord(word)) {
 				fail("The unsolvable word '" + word + "' was incorrectly classified as solvable.");
 			}
 		}
+	}
+
+	private void testUnsolvableSubWord(UnsolvableBinwordMatcher matcher) {
+		final String unsolvableWord = "a" + "abbaa";
+		assertTrue("The word 'aabbaa' containing the unsolvable factor 'abbaa' was incorrectly classified as solvable.",
+				matcher.isUnsolvableBinaryWord(unsolvableWord));
 	}
 
 }

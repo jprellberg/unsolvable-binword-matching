@@ -34,7 +34,7 @@ public class JavaRegexUBM implements UnsolvableBinwordMatcher {
 	public boolean isUnsolvableBinaryWord(String word) {
 		final Matcher matcherA = patternA.matcher(word);
 		final Matcher matcherB = patternB.matcher(word);
-		return matcherA.matches() || matcherB.matches();
+		return matcherA.find() || matcherB.find();
 	}
 
 }
