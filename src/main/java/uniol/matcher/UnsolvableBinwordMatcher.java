@@ -31,7 +31,7 @@ public interface UnsolvableBinwordMatcher {
 	 *
 	 * @param word
 	 *                a binary word over the alphabet {a, b}
-	 * @return true, if the word is unsolvable
+	 * @return true if the word is unsolvable
 	 */
 	boolean isUnsolvableBinaryWord(String word);
 

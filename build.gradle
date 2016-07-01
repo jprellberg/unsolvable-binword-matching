@@ -1,10 +1,38 @@
+buildscript {
+	repositories {
+		maven {
+			url "https://plugins.gradle.org/m2/"
+		}
+	}
+	dependencies {
+		classpath "me.champeau.gradle:jmh-gradle-plugin:0.3.1"
+	}
+}
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: "me.champeau.gradle.jmh"
 
 repositories {
-    mavenCentral()
+	mavenCentral()
+}
+
+sourceSets {
+    util
 }
 
 dependencies {
-    testCompile 'junit:junit:4.12'
+	jmh sourceSets.util.output
+
+	testCompile sourceSets.util.output
+	testCompile 'org.hamcrest:hamcrest-junit:2.0.0.0'
+	testCompile 'junit:junit:4.12'
+}
+
+jmh {
+	includeTests = false
+	threads = 4
+	warmupIterations = 1
+	iterations = 1
+	fork = 1
 }

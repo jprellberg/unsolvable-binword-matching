@@ -19,14 +19,9 @@
 
 package uniol.matcher;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
@@ -37,28 +32,20 @@ public class UnsolvableBinwordMatcherTest {
 	private List<String> unsolvableWords;
 
 	@Before
-	public void setup() throws IOException {
-		unsolvableWords = readWordFile();
-	}
-
-	private List<String> readWordFile() throws IOException {
-		InputStream is = UnsolvableBinwordMatcherTest.class
-				.getResourceAsStream("/binary-nonsyntetizable-words");
-		BufferedReader br = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-
-		List<String> words = new ArrayList<>();
-		String line;
-		while ((line = br.readLine()) != null) {
-			if (!line.startsWith("#")) {
-				words.add(line);
-			}
-		}
-		return words;
+	public void setup() {
+		unsolvableWords = new BinaryWordList().getUnsolvableWords();
 	}
 
 	@Test
 	public void javaRegexUBMTest() {
 		UnsolvableBinwordMatcher matcher = new JavaRegexUBM();
+		testUnsolvableWords(matcher);
+		testUnsolvableSubWord(matcher);
+	}
+
+	@Test
+	public void patternUBMTest() {
+		UnsolvableBinwordMatcher matcher = new PatternUBM();
 		testUnsolvableWords(matcher);
 		testUnsolvableSubWord(matcher);
 	}
@@ -72,7 +59,7 @@ public class UnsolvableBinwordMatcherTest {
 	}
 
 	private void testUnsolvableSubWord(UnsolvableBinwordMatcher matcher) {
-		final String unsolvableWord = "a" + "abbaa";
+		String unsolvableWord = "a" + "abbaa";
 		assertTrue("The word 'aabbaa' containing the unsolvable factor 'abbaa' was incorrectly classified as solvable.",
 				matcher.isUnsolvableBinaryWord(unsolvableWord));
 	}
