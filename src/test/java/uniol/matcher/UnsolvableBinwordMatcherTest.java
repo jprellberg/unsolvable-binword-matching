@@ -19,8 +19,8 @@
 
 package uniol.matcher;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.List;
 
@@ -39,22 +39,33 @@ public class UnsolvableBinwordMatcherTest {
 	@Test
 	public void javaRegexUBMTest() {
 		UnsolvableBinwordMatcher matcher = new JavaRegexUBM();
-		testUnsolvableWords(matcher);
-		testUnsolvableSubWord(matcher);
+		testAll(matcher);
 	}
 
 	@Test
 	public void patternUBMTest() {
 		UnsolvableBinwordMatcher matcher = new PatternUBM();
+		assertFalse(matcher.isUnsolvableBinaryWord("abbba"));
+		testAll(matcher);
+	}
+
+	@Test
+	public void letterCountingUBMTest() {
+		UnsolvableBinwordMatcher matcher = new LetterCountingUBM();
+		testAll(matcher);
+	}
+
+	private void testAll(UnsolvableBinwordMatcher matcher) {
 		testUnsolvableWords(matcher);
 		testUnsolvableSubWord(matcher);
+		testSimpleSolvableWords(matcher);
+		testSolvableWords(matcher);
 	}
 
 	private void testUnsolvableWords(UnsolvableBinwordMatcher matcher) {
 		for (String word : unsolvableWords) {
-			if (!matcher.isUnsolvableBinaryWord(word)) {
-				fail("The unsolvable word '" + word + "' was incorrectly classified as solvable.");
-			}
+			assertTrue("The unsolvable word '" + word + "' was incorrectly classified as solvable.",
+					matcher.isUnsolvableBinaryWord(word));
 		}
 	}
 
@@ -62,6 +73,25 @@ public class UnsolvableBinwordMatcherTest {
 		String unsolvableWord = "a" + "abbaa";
 		assertTrue("The word 'aabbaa' containing the unsolvable factor 'abbaa' was incorrectly classified as solvable.",
 				matcher.isUnsolvableBinaryWord(unsolvableWord));
+	}
+
+	private void testSimpleSolvableWords(UnsolvableBinwordMatcher matcher) {
+		assertFalse(matcher.isUnsolvableBinaryWord("aaaaaaaa"));
+		assertFalse(matcher.isUnsolvableBinaryWord("bbbbbbbb"));
+		assertFalse(matcher.isUnsolvableBinaryWord("aaaabbbb"));
+	}
+
+	private void testSolvableWords(UnsolvableBinwordMatcher matcher) {
+		BinaryWordList wordList = new BinaryWordList();
+		List<String> unsolvableWords = wordList.getUnsolvableWords();
+		for (String minUnsolvableWord : unsolvableWords) {
+			String prefix = minUnsolvableWord.substring(0, minUnsolvableWord.length() - 1);
+			String suffix = minUnsolvableWord.substring(1);
+			assertFalse("The word '" + prefix + "' was incorrectly classified as unsolvable.",
+					matcher.isUnsolvableBinaryWord(prefix));
+			assertFalse("The word '" + suffix + "' was incorrectly classified as unsolvable.",
+					matcher.isUnsolvableBinaryWord(suffix));
+		}
 	}
 
 }
