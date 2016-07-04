@@ -36,7 +36,7 @@ import org.openjdk.jmh.infra.Blackhole;
 @State(Scope.Thread)
 public class UnsolvableBinwordMatcherBenchmark {
 
-	@Param({ "JavaRegexUBM", "PatternUBM" })
+	@Param({ "JavaRegexUBM", "PatternUBM", "LetterCountingUBM" })
 	public String implementation;
 
 	@Param({ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "15", "20" })
@@ -53,6 +53,9 @@ public class UnsolvableBinwordMatcherBenchmark {
 			break;
 		case "PatternUBM":
 			matcher = new PatternUBM();
+			break;
+		case "LetterCountingUBM":
+			matcher = new LetterCountingUBM();
 			break;
 		default:
 			throw new RuntimeException("Unhandled parameter value");
