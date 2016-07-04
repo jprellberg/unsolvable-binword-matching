@@ -69,10 +69,13 @@ public class PatternUBM implements UnsolvableBinwordMatcher {
 	 * @return true if the input word contains a subsequence of pattern I
 	 */
 	boolean containsPatternI(final char[] word, final char delim) {
+		int delimiterCount = 0;
+
 		int firstDelimIndex = word.length;
 		for (int i = 0; i < word.length; i++) {
 			if (word[i] == delim) {
 				firstDelimIndex = i;
+				delimiterCount += 1;
 				break;
 			}
 
@@ -81,9 +84,10 @@ public class PatternUBM implements UnsolvableBinwordMatcher {
 		int x = 0;
 		int y = 0;
 
-		for (int i = firstDelimIndex; i < word.length; i++) {
+		for (int i = firstDelimIndex + 1; i < word.length; i++) {
 			if (word[i] == delim) {
-				if (x > y + 2) {
+				delimiterCount += 1;
+				if (x > y + 2 && delimiterCount >= 3) {
 					return true;
 				} else {
 					x = y;
@@ -94,7 +98,7 @@ public class PatternUBM implements UnsolvableBinwordMatcher {
 			}
 		}
 
-		return x > y + 2 && word[word.length - 1] == delim;
+		return false;
 	}
 
 	/**
@@ -141,10 +145,14 @@ public class PatternUBM implements UnsolvableBinwordMatcher {
 
 				// Build border table for suffix of v starting
 				// at i (v[i..]) with KMP
-				int[] borderTable = kmpFailureFunction(word, i);
-				// Search for repetitions
-				for (int j = 1; j < borderTable.length; j++) {
-					if ((j - i) % (j - borderTable[j]) == 0 && word[i + 1] == a) {
+				int[] f = kmpFailureFunction(word, i);
+				// Search for a repeating string s in v[i..j] with v[i..j] = s^n
+				for (int j = i + 1; j < f.length - 1; j++) {
+					// There is a repetition when the period length divides the string length (j - i + 1)
+					if (f[j] > 1 && (j - i + 1) % (j - i + 1 - f[j]) == 0 && word[j + 1] == a) {
+						// Reverse temporary swap
+						word[i] = a;
+						word[i + 1] = b;
 						return true;
 					}
 				}
@@ -159,34 +167,36 @@ public class PatternUBM implements UnsolvableBinwordMatcher {
 
 	/**
 	 * Returns the Knuth-Morris-Pratt failure function (also called border
-	 * table) for the given pattern which starts at the given index.
+	 * table) for the given pattern which starts at the given index. The
+	 * returned array contains undefined values for any indices smaller than
+	 * pIdx.
 	 *
 	 * @param p
 	 *                char array that contains the pattern as a suffix
 	 * @param pIdx
 	 *                index at which the pattern starts in the pattern char
 	 *                array
-	 * @return 0-indexed border table/failure function
+	 * @return 0-indexed border table/failure function with length =
+	 *         p.length
 	 */
 	int[] kmpFailureFunction(char[] p, int pIdx) {
-		int patternLength = p.length - pIdx;
-		int[] f = new int[patternLength];
-
-		f[0] = 0;
+		int[] f = new int[p.length];
+		f[pIdx] = 0;
 
 		int i = 1;
 		int j = 0;
 
+		int patternLength = p.length - pIdx;
 		while (i < patternLength) {
 			if (p[pIdx + i] == p[pIdx + j]) {
-				f[i] = j + 1;
+				f[pIdx + i] = j + 1;
 				i = i + 1;
 				j = j + 1;
-			} else if (j > 1) {
-				j = f[j - 1];
-			} else {
-				f[i] = 0;
+			} else if (j == 0) {
+				f[pIdx + i] = 0;
 				i = i + 1;
+			} else {
+				j = f[pIdx + j - 1];
 			}
 		}
 

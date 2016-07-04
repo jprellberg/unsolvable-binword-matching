@@ -73,47 +73,54 @@ public class PatternUBMTest {
 	@Test
 	public void testPatternIIa3() {
 		// w = bab, k = 2
-		String word = "abbabbababbaba";
+		String word = "abbabbababbababa";
 		assertThat(matcher.containsPatternII(word.toCharArray(), 'a', 'b'), is(true));
 	}
 
 	@Test
 	public void testPatternIIa4() {
 		// prefix = aaaaaaa, w = bab, k = 2
-		String word = "aaaaaaaabbabbababbaba";
+		String word = "aaaaaaaabbabbababbababa";
 		assertThat(matcher.containsPatternII(word.toCharArray(), 'a', 'b'), is(true));
 	}
 
 	@Test
 	public void testPatternIIa5() {
 		String word = "abaaa";
-		assertThat(matcher.containsPatternII(word.toCharArray(), 'a', 'b'), is(true));
+		assertThat(matcher.containsPatternII(word.toCharArray(), 'a', 'b'), is(false));
 	}
 
 	@Test
 	public void testKmpFailureFunction1() {
 		char[] pattern = "ACACAGT".toCharArray();
 		int[] borderTable = matcher.kmpFailureFunction(pattern, 0);
-		assertThat(box(borderTable), arrayContaining(0, 0, 1, 2, 3, 0, 0));
+		assertThat(box(borderTable, 0), arrayContaining(0, 0, 1, 2, 3, 0, 0));
 	}
 
 	@Test
 	public void testKmpFailureFunction2() {
 		char[] pattern = "012ACACAGT".toCharArray();
 		int[] borderTable = matcher.kmpFailureFunction(pattern, 3);
-		assertThat(box(borderTable), arrayContaining(0, 0, 1, 2, 3, 0, 0));
+		assertThat(box(borderTable, 3), arrayContaining(0, 0, 1, 2, 3, 0, 0));
 	}
 
 	@Test
 	public void testKmpFailureFunction3() {
 		char[] pattern = "PARTICIPATE IN PARACHUTE".toCharArray();
 		int[] borderTable = matcher.kmpFailureFunction(pattern, 0);
-		assertThat(box(borderTable), arrayContaining(0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 1, 2, 3, 0, 0,
+		assertThat(box(borderTable, 0), arrayContaining(0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 1, 2, 3, 0, 0,
 				0, 0, 0, 0));
 	}
 
-	private Integer[] box(int[] array) {
-		return IntStream.of(array).boxed().toArray(Integer[]::new);
+	@Test
+	public void testKmpFailureFunction4() {
+		char[] pattern = "babbb".toCharArray();
+		int[] borderTable = matcher.kmpFailureFunction(pattern, 0);
+		assertThat(box(borderTable, 0), arrayContaining(0, 0, 1, 1, 1));
+	}
+
+	private Integer[] box(int[] array, int skip) {
+		return IntStream.of(array).skip(skip).boxed().toArray(Integer[]::new);
 	}
 
 }
